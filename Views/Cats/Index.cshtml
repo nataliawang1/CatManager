@@ -1,0 +1,110 @@
+@model IEnumerable<CatManager.Models.Cat>
+
+@{
+    ViewData["Title"] = "Gatitos";
+}
+
+<div class="container">
+    <h1 class="display-4 mb-4">Gatitos</h1>
+
+    <div class="row mb-4">
+        <div class="col">
+            <form asp-action="Index" method="get" class="form">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Buscar gatitos..." />
+                    </div>
+                    <div class="col-md-3">
+                        <select name="searchType" class="form-select">
+                            <option value="">Buscar en todo</option>
+                            <option value="name" selected="@(ViewData["SearchType"]?.ToString() == "name")">Nombre</option>
+                            <option value="breed" selected="@(ViewData["SearchType"]?.ToString() == "breed")">Raza</option>
+                            <option value="color" selected="@(ViewData["SearchType"]?.ToString() == "color")">Color</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="isAvailable" class="form-select">
+                            <option value="">Todos los gatitos</option>
+                            <option value="true" selected="@(ViewData["IsAvailable"]?.ToString() == "True")">Disponibles</option>
+                            <option value="false" selected="@(ViewData["IsAvailable"]?.ToString() == "False")">No disponibles</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <a asp-action="Create" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Agregar Gatito
+            </a>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var cat in Model)
+        {
+            <div class="col">
+                <div class="card h-100">
+                    @if (!string.IsNullOrEmpty(cat.ImageUrl))
+                    {
+                        <img src="~/images/cats/@cat.ImageUrl" class="card-img-top" alt="@cat.Name" style="height: 200px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <img src="~/images/cats/default-cat.jpg" class="card-img-top" alt="Default Cat" style="height: 200px; object-fit: cover;">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@cat.Name</h5>
+                        <p class="card-text">
+                            <strong>Raza:</strong> @cat.Breed<br>
+                            <strong>Edad:</strong> @cat.Age años<br>
+                            <strong>Color:</strong> @cat.Color
+                        </p>
+                        <p class="card-text">@cat.Description</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                @if (cat.IsAvailable)
+                                {
+                                    <span class="badge bg-success">Disponible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">No disponible</span>
+                                }
+                                @if (cat.IsKidFriendly)
+                                {
+                                    <span class="badge bg-info">Amigable con niños</span>
+                                }
+                            </div>
+                            <a asp-action="Edit" asp-route-id="@cat.Id" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <div class="btn-group">
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" class="btn btn-outline-primary">
+                    Ordenar por Nombre
+                </a>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["AgeSortParm"]" class="btn btn-outline-primary">
+                    Ordenar por Edad
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
